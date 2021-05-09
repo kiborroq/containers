@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/23 10:09:38 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/08 23:33:43 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/09 21:28:14 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ namespace ft
 	struct equal_to : binary_function <T, T, bool>
 	{
   		bool operator() (T const& x, T const& y) const
-		{ return x == y; }
+		{ ft::less<T> _less; return _less(x, y) || _less(y, x); }
 	};
 
 	template <typename T1, typename T2>
@@ -56,6 +56,7 @@ namespace ft
 			second_type second;
 
 			pair(void)
+				: first(), second()
 			{ }
 
 			pair(first_type const& f, second_type const& s)

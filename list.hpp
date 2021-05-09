@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/12 22:32:52 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/08 23:27:41 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/10 00:13:30 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LIST_HPP
 
 # include <memory>
+# include <limits>
 # include "random_access_iterator.hpp"
 # include "list_iterator.hpp"
 # include "iterator.hpp"
@@ -99,7 +100,10 @@ namespace ft
 
 			bool empty(void) const { return _size == 0; }
 			size_type size(void) const { return _size; }
-			size_type max_size(void) const { return _alloc.max_size(); }
+			size_type max_size(void) const
+			{
+				return std::numeric_limits<difference_type>::max() / (sizeof(node) - sizeof(value_type *) + sizeof(value_type));
+			}
 
 
 			/*

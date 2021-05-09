@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   _rb_tree_iterator.hpp                                   :+:      :+:    :+:   */
+/*   _rb_tree.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/22 21:05:30 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/04/24 10:52:19 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/10 01:31:51 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,7 +185,7 @@ template <typename T, typename _T>
 
 	}; // class _rb_tree_iterator
 
-	template < typename T, typename Alloc = std::allocator<T>, typename Less = ft::less<T>, typename Equal = ft::equal_to<T> >
+	template < typename T, typename Alloc = std::allocator<T>, typename Less = ft::less<T>>
 	class _rb_tree
 	{
 		public:
@@ -193,7 +193,6 @@ template <typename T, typename _T>
 			typedef Alloc								allocator_type;
 			typedef value_type &						reference;
 			typedef Less								compare_less;
-			typedef Equal								compare_eqaul;
 			typedef value_type const&					const_reference;
 			typedef value_type *						pointer;
 			typedef value_type const*					const_pointer;
@@ -213,37 +212,38 @@ template <typename T, typename _T>
 			node _min;
 			node _max;
 			compare_less _less;
-			compare_eqaul _equal;
 			allocator_type _alloc;
 
 		public:
 			explicit _rb_tree(compare_less const& l = compare_less(),
-				compare_eqaul const& e = compare_eqaul(),
 				allocator_type const& alloc = allocator_type())
-				: _size(0), _root(NULL), _min(node()), _max(node()), _less(l), _equal(e), _alloc(alloc)
+				: _size(0), _root(NULL), _min(node()), _max(node()), _less(l), _alloc(alloc)
 			{ _link_root_min_max(); }
 
 			template <typename InputIterator>
 			_rb_tree (InputIterator first, InputIterator last,
 				compare_less const& l = compare_less(),
-				compare_eqaul const& e = compare_eqaul(),
 				allocator_type const& alloc = allocator_type())
-				: _size(0), _root(NULL), _min(node()), _max(node()), _less(l), _equal(e), _alloc(alloc)
+				: _size(0), _root(NULL), _min(node()), _max(node()), _less(l), _alloc(alloc)
 			{
 				_link_root_min_max();
 				_insert(first, last);
 			}
 
 			_rb_tree(_rb_tree const& tree)
-				: _size(0), _root(NULL), _min(node()), _max(node()), _less(tree._less), _equal(tree._equal), _alloc(tree._alloc)
-			{ *this = tree; }
+				: _size(0), _root(NULL), _min(node()), _max(node()), _less(tree._less), _alloc(tree._alloc)
+			{
+				_link_root_min_max();
+				_insert(tree._begin(), tree._end());
+			}
 
 			~_rb_tree(void)
 			{ _clear(); }
 
 			_rb_tree operator=(_rb_tree const& tree)
 			{
-				_clear();
+				if (_size > 0)
+					_clear();
 				_insert(tree._begin(), tree._end());
 				return *this;
 			}
@@ -277,6 +277,15 @@ template <typename T, typename _T>
 			{ return const_reverse_iterator( const_iterator( const_cast<node *>(&_max) ) ); }
 
 			/*
+			**Member functions - CAPASITY
+			*/	
+
+			size_type _max_size(void) const
+			{
+				return std::numeric_limits<difference_type>::max() / (sizeof(node) - sizeof(value_type *) + sizeof(value_type));
+			}
+
+			/*
 			**Member functions - MODIFIERS
 			*/
 
@@ -291,14 +300,11 @@ template <typename T, typename _T>
 				return _insert_by_val(val, _root);
 			}
 
-			iterator _insert(iterator position, value_type const& val)
-			{ (void)position; return _insert(val); }
-
 			template <typename InputIterator>
 			void _insert(InputIterator first, InputIterator last)
 			{
 				while (first != last)
-					_inseet(*first++);
+					_insert(*first++);
 			}
 
 			void _erase(iterator position)
@@ -317,17 +323,16 @@ template <typename T, typename _T>
 			{
 				if (_size > 0)
 				{
-					this->_min.parent->left = tree._min;
-					tree._min.parent->left = this->_min;
+					this->_min.parent->left = &tree._min;
+					tree._min.parent->left = &this->_min;
 
-					this->_max.parent->right = tree._max;
-					tree._max.parent->right = this->_max;
+					this->_max.parent->right = &tree._max;
+					tree._max.parent->right = &this->_max;
 
 					ft::swap(this->_min.parent, tree._min.parent);
 					ft::swap(this->_max.parent, tree._max.parent);
 					ft::swap(this->_size, tree._size);
 					ft::swap(this->_less, tree._less);
-					ft::swap(this->_equal, tree._equal);
 					ft::swap(this->_alloc, tree._alloc);
 				}
 			}
@@ -340,15 +345,19 @@ template <typename T, typename _T>
 			{ return iterator(_find_by_val(val, _root)); }
 
 			const_iterator _find(value_type const& val) const
-			{ return const_iterator(_find_by_val(val, _root)); }
+			{ return const_iterator(iterator(_find_by_val(val, _root))); }
 
-
+			/*
+			**Private functions - INNERS
+			*/
 
 			node *_find_by_val(value_type const& val, node *curr)
 			{
-				if (curr == NULL || curr->color == _color::max || curr->color == _color::min)
-					return &_max;
-				if (_equal(val, *curr->data))
+				if (curr == NULL
+					|| curr->color == _color::min
+					|| curr->color == _color::max)
+					return NULL;
+				if (_equal_to(val, *curr->data))
 					return curr;
 				if (_less(val, *curr->data))
 					return _find_by_val(val, curr->left);
@@ -586,8 +595,10 @@ template <typename T, typename _T>
 					parent->color = _color::black;
 					uncle->color = _color::black;
 					if (grandpa->parent != NULL)
+					{
 						grandpa->color = _color::red;
-					_balance_after_insert(grandpa);
+						_balance_after_insert(grandpa);
+					}
 					return ;
 				}
 
@@ -788,7 +799,14 @@ template <typename T, typename _T>
 				_min.color = _color::min;
 				_max.color = _color::max;
 			}
-   
+
+			bool _equal_to(value_type const& x, value_type const& y)
+			{
+				if (_less(x, y) == false && _less(y, x) == false)
+					return true;
+				return false;
+			}
+
 	}; // class _rb_tree
 
 }; // namespace ft

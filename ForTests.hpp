@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ForTests.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/17 13:45:00 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/05 11:43:06 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/10 01:56:59 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,24 @@
 #include <sstream>
 #include <iomanip>
 #include "iterator.hpp"
+#include "utils.hpp"
 
 #define OK "\033[1;32mOK\033[0m"
 #define KO "\033[1;31mKO\033[0m"
+
+template <typename Key, typename Val>
+std::ostream & operator<<(std::ostream & out, ft::pair<Key, Val> const & p) 
+{
+	out << p.first << "-" << p.second;
+	return (out);
+}
+
+template <typename Key, typename Val>
+std::ostream & operator<<(std::ostream & out, std::pair<Key, Val> const & p) 
+{
+	out << p.first << "-" << p.second;
+	return (out);
+}
 
 template <typename InputIterator>
 void print_cont(InputIterator first, InputIterator last, std::iostream & os)
@@ -44,11 +59,9 @@ std::string get_info_cont(itCont const& c)
 
 	stream << "NORMAL: ";
 	print_cont(c.begin(), c.end(), stream);
-				// std::cout << stream.str() << std::endl;
 
 	stream << "REVERSE: ";
 	print_cont(c.rbegin(), c.rend(), stream);
-				// std::cout << 51 << std::endl;
 
 	return stream.str();
 }
@@ -103,7 +116,7 @@ std::ostream & operator<<(std::ostream & out, Human const & h)
 
 int get_random_val(int)
 {
-	return 5 + rand() % 10;
+	return 5 + rand() % 500;
 }
 
 std::string get_random_val(std::string)
@@ -150,6 +163,20 @@ template <typename T>
 void print_result(T std_res, T ft_res)
 {
 	if (ft_res == std_res)
+		print_test_res(OK);
+	else
+	{
+		print_test_res(KO);
+		std::cout << std::endl;
+		std::cout << "std-> " << std_res << std::endl;
+		std::cout << "ft -> " << ft_res << std::endl;
+	}
+}
+
+template <typename stdPair, typename ftPair>
+void print_result_pair(stdPair & std_res, ftPair & ft_res)
+{
+	if (ft_res.first == std_res.first && ft_res.second == std_res.second)
 		print_test_res(OK);
 	else
 	{
@@ -968,6 +995,230 @@ class ListTests
 			}
 			std::cout << std::endl;
 		}
+};
+
+#include <map>
+#include "map.hpp"
+
+template <typename Key, typename Val>
+class MapTests
+{
+	private:
+		typedef std::map<Key, Val> stdMap;
+		typedef ft::map<Key, Val> ftMap;
+
+		typedef typename std::map<Key, Val>::iterator stdIt;
+		typedef typename ft::map<Key, Val>::iterator ftIt;
+
+		void fill_map(ftMap & ft_m, stdMap & std_m)
+		{
+
+			int count = 1000;
+
+			while (count-- > 0)
+			{
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+
+				ft_m.insert(ft::make_pair(k, v));
+				std_m.insert(std::make_pair(k, v));
+			}
+		}
+
+	public:
+		MapTests(void) { }
+		~MapTests(void) { }
+
+		void DoTests(void)
+		{
+			ftMap ft_m;
+			stdMap std_m;
+			fill_map(ft_m, std_m);
+
+			print_func_name("counstructors");
+			{	
+				ftMap ft_m1;
+				stdMap std_m1;
+				print_result(std_m1, ft_m1);
+
+				ftMap ft_m2(ft_m);
+				stdMap std_m2(std_m);
+				print_result(std_m2, ft_m2);
+				
+				ftMap ft_m3(ft_m.rbegin(), ft_m.rend());
+				stdMap std_m3(std_m.rbegin(), std_m.rend());
+				print_result(std_m3, ft_m3);
+			}
+			std::cout << std::endl;
+
+			print_func_name("max_size");
+			{
+				print_result(std_m.max_size(), ft_m.max_size());
+			}
+			std::cout << std::endl;
+
+			print_func_name("empty");
+			{
+				ftMap ft_m1;
+				stdMap std_m1;
+				print_result(std_m1.empty(), ft_m1.empty());
+
+				print_result(std_m.empty(), ft_m.empty());				
+			}
+			std::cout << std::endl;
+
+			print_func_name("operator[]");
+			{
+				ftMap ft_m1(ft_m);
+				stdMap std_m1(std_m);
+				
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+				Val v1 = get_random_val(Val());
+
+				ft_m1[k] = v;
+				std_m1[k] = v;
+				print_result(std_m1, ft_m1);
+
+				ft_m1[k] = v1;
+				std_m1[k] = v1;
+				print_result(std_m1, ft_m1);
+
+				print_result(ft_m1[k], std_m1[k]);
+			}
+			std::cout << std::endl;
+
+			print_func_name("insert");
+			{
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+
+				ftMap ft_m1;
+				stdMap std_m1;
+				fill_map(ft_m1, std_m1);
+				print_result(std_m1, ft_m1);
+
+				ft_m1.insert(ft_m.rbegin(), ft_m.rend());
+				std_m1.insert(std_m.rbegin(), std_m.rend());
+				print_result(std_m1, ft_m1);
+				
+				ft_m1.insert(ft_m.begin(), ft::make_pair(k, v));
+				std_m1.insert(std_m.begin(), std::make_pair(k, v));
+				print_result(std_m1, ft_m1);
+			}
+			std::cout << std::endl;
+
+			print_func_name("erase");
+			{
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+
+				ft_m.insert(ft::make_pair(k, v));
+				std_m.insert(std::make_pair(k, v));
+
+				ftIt ft_it = ft_m.find(k);
+				stdIt std_it = std_m.find(k);
+
+				ft_m.erase(ft_it);
+				std_m.erase(std_it);
+				print_result(std_m, ft_m);
+
+				ft_m.insert(ft::make_pair(k, v));
+				std_m.insert(std::make_pair(k, v));
+
+				ft_m.erase(k);
+				std_m.erase(k);
+				print_result(std_m, ft_m);
+
+				ftMap ft_m1(ft_m);
+				stdMap std_m1(std_m);
+
+				ft_m1.erase(ft_m1.begin(), ft_m1.end());
+				std_m1.erase(std_m1.begin(), std_m1.end());
+				print_result(std_m1, ft_m1);
+			}
+			std::cout << std::endl;
+			
+			print_func_name("swap");
+			{
+				ftMap ft_m1;
+				stdMap std_m1;
+				fill_map(ft_m1, std_m1);
+
+				ftMap ft_m2;
+				stdMap std_m2;
+				fill_map(ft_m2, std_m2);
+
+				ft_m1.swap(ft_m2);
+				std_m1.swap(std_m2);
+				print_result(std_m2, ft_m2);
+				print_result(std_m1, ft_m1);
+			}
+			std::cout << std::endl;
+
+			print_func_name("clear");
+			{
+				ftMap ft_m1;
+				stdMap std_m1;
+				fill_map(ft_m1, std_m1);
+
+				ft_m1.clear();
+				std_m1.clear();
+				print_result(std_m1, ft_m1);
+
+				ft_m1.clear();
+				std_m1.clear();
+				print_result(std_m1, ft_m1);
+			}
+			std::cout << std::endl;
+
+			print_func_name("find");
+			{
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+
+				ft_m.insert(ft::make_pair(k, v));
+				std_m.insert(std::make_pair(k, v));
+
+				ftIt ft_it = ft_m.find(k);
+				stdIt std_it = std_m.find(k);
+
+				print_result_pair(*std_it, *ft_it);
+			}
+			std::cout << std::endl;
+
+			print_func_name("lower_bound");
+			{
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+
+				ft_m.insert(ft::make_pair(k, v));
+				std_m.insert(std::make_pair(k, v));
+
+				ftIt ft_it = ft_m.lower_bound(k);
+				stdIt std_it = std_m.lower_bound(k);
+
+				print_result_pair(*std_it, *ft_it);
+			}
+			std::cout << std::endl;
+
+			print_func_name("upper_bound");
+			{
+				Key k = get_random_val(Key());
+				Val v = get_random_val(Val());
+
+				ft_m.insert(ft::make_pair(k, v));
+				std_m.insert(std::make_pair(k, v));
+
+				ftIt ft_it = ft_m.upper_bound(k);
+				stdIt std_it = std_m.upper_bound(k);
+
+				print_result_pair(*std_it, *ft_it);
+			}
+			std::cout << std::endl;
+		}
+		
+		
 };
 
 #endif

@@ -6,13 +6,14 @@
 /*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/07 11:24:36 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/08 23:34:46 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/09 23:05:41 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <memory>
 #include <vector>
-#include "map_iterator.hpp"
+#include "_rb_tree.hpp"
+#include "map.hpp"
 // #include "vector.hpp"
 #include <iostream>
 #include <iterator>
@@ -337,6 +338,8 @@ int main ()
 
 		// print_tree(tree);
 	}
+
+	ft::_rb_tree<int> tree2(tree);
 
 	// char c = _color::BLACK;
 
