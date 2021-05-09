@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/23 10:09:38 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/05 12:00:03 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/08 23:33:43 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,14 @@
 
 namespace ft
 {
+	template <typename T>
+	void swap(T & first, T & second)
+	{
+		T tmp = first;
+		first = second;
+		second = tmp;
+	}
+
 	template <class T1, class T2, class Result>
 	struct binary_function
 	{

@@ -57,6 +57,9 @@ namespace ft
 		bool _is_left(void)
 		{ return !_is_right(); }
 
+		bool _is_child(_rb_node *parent)
+		{ return parent->left == this || parent->right == this; }
+
 	}; // struct _rb_node
 
 template <typename T, typename _T>
@@ -220,6 +223,35 @@ template <typename T, typename _T>
 				: _size(0), _root(NULL), _min(node()), _max(node()), _less(l), _equal(e), _alloc(alloc)
 			{ _link_root_min_max(); }
 
+			template <typename InputIterator>
+			_rb_tree (InputIterator first, InputIterator last,
+				compare_less const& l = compare_less(),
+				compare_eqaul const& e = compare_eqaul(),
+				allocator_type const& alloc = allocator_type())
+				: _size(0), _root(NULL), _min(node()), _max(node()), _less(l), _equal(e), _alloc(alloc)
+			{
+				_link_root_min_max();
+				_insert(first, last);
+			}
+
+			_rb_tree(_rb_tree const& tree)
+				: _size(0), _root(NULL), _min(node()), _max(node()), _less(tree._less), _equal(tree._equal), _alloc(tree._alloc)
+			{ *this = tree; }
+
+			~_rb_tree(void)
+			{ _clear(); }
+
+			_rb_tree operator=(_rb_tree const& tree)
+			{
+				_clear();
+				_insert(tree._begin(), tree._end());
+				return *this;
+			}
+
+			/*
+			**Member functions - ITERATORS
+			*/
+
 			iterator _begin(void)
 			{ return iterator(_min.parent); }
 			
@@ -244,11 +276,73 @@ template <typename T, typename _T>
 			const_reverse_iterator _rbegin(void) const
 			{ return const_reverse_iterator( const_iterator( const_cast<node *>(&_max) ) ); }
 
+			/*
+			**Member functions - MODIFIERS
+			*/
+
+			iterator _insert(value_type const& val)
+			{
+				if (_size == 0)
+					return _insert_first_node(val);
+				if (_less(val, *_min.parent->data))
+					return _insert_by_val(val, _min.parent);
+				if (!_less(val, *_max.parent->data))
+					return _insert_by_val(val, _max.parent);
+				return _insert_by_val(val, _root);
+			}
+
+			iterator _insert(iterator position, value_type const& val)
+			{ (void)position; return _insert(val); }
+
+			template <typename InputIterator>
+			void _insert(InputIterator first, InputIterator last)
+			{
+				while (first != last)
+					_inseet(*first++);
+			}
+
+			void _erase(iterator position)
+			{ _erase_node(position._tree); }
+
+			void _erase(iterator first, iterator last)
+			{
+				while (first != last)
+					_erase(first++);				
+			}
+
+			void _clear(void)
+			{ _erase(_begin(), _end()); }
+
+			void _swap(_rb_tree & tree)
+			{
+				if (_size > 0)
+				{
+					this->_min.parent->left = tree._min;
+					tree._min.parent->left = this->_min;
+
+					this->_max.parent->right = tree._max;
+					tree._max.parent->right = this->_max;
+
+					ft::swap(this->_min.parent, tree._min.parent);
+					ft::swap(this->_max.parent, tree._max.parent);
+					ft::swap(this->_size, tree._size);
+					ft::swap(this->_less, tree._less);
+					ft::swap(this->_equal, tree._equal);
+					ft::swap(this->_alloc, tree._alloc);
+				}
+			}
+
+			/*
+			**Member functions - OPERATIONS
+			*/
+
 			iterator _find(value_type const& val)
 			{ return iterator(_find_by_val(val, _root)); }
 
 			const_iterator _find(value_type const& val) const
 			{ return const_iterator(_find_by_val(val, _root)); }
+
+
 
 			node *_find_by_val(value_type const& val, node *curr)
 			{
@@ -261,77 +355,178 @@ template <typename T, typename _T>
 				return _find_by_val(val, curr->right);
 			}
 
-			void _erase_node(node *n)
+			iterator _insert_by_val(value_type const& val, node *start)
 			{
-				if (_count_child(n) == 0)
-					_relink_parent(n, NULL);
-				else if (_count_child(n) == 1)
+				pointer data = _alloc.allocate(1);
+				_alloc.construct(data, val);
+
+				node *child = new node(_color::red, NULL, NULL, NULL, data);
+				node *parent = _get_pos_for_insert(val, start);
+
+				if (parent->color == _color::min || parent->color == _color::max)
+					parent = parent->parent;
+				if (_less(val, *parent->data))
 				{
-					node *tmp = n->right == NULL ? n->left : n->right;
-					_relink_parent(n, tmp);
-					_balance_tree(tmp);
+					child->left = parent->left;
+					parent->left = child;
+					if (child->left != NULL)
+						child->left->parent = child;
 				}
 				else
 				{
-					node *min = _get_min(n->right);
+					child->right = parent->right;
+					parent->right = child;
+					if (child->right != NULL)
+						child->right->parent = child;
+				}
+				child->parent = parent;
+				_size++;
+
+				_balance_after_insert(child);
+				return iterator(child);
+			}
+
+			void _erase_node(node *n)
+			{
+				if (_size == 1)
+					_link_root_min_max();
+				else if (_count_child(n) == 0)
+				{
+					node **ptr = _get_ptr_to_node(n);
+					if (n->left == &_min)
+					{
+						*ptr = &_min;
+						_min.parent = n->parent;
+					}
+					else if (n->right == &_max)
+					{
+						*ptr = &_max;
+						_max.parent = n->parent;
+					}
+					else
+						*ptr = NULL;
+					if (n->color == _color::black)
+						_balance_after_erase(n->parent, _get_son(n->parent));
+				}
+				else if (_count_child(n) == 1)
+				{
+					node *tmp = (n->right == NULL || n->right == &_max) ? n->left : n->right;
+
+					_relink_parent(n, tmp);
+					if (n->left == &_min)
+					{
+						tmp->left = &_min;
+						_min.parent = tmp;
+					}
+					else if (n->right == &_max)
+					{
+						tmp->right = &_max;
+						_max.parent = tmp;
+					}
+					tmp->color = _color::black;
+				}
+				else
+				{
+					node *min = _get_max(n->left);
+
 					_swap_nodes(n, min);
-					_balance_tree(n->parent);
+					_erase_node(n);
+					return ;
 				}
 
 				_alloc.destroy(n->data);
 				_alloc.deallocate(n->data, 1);
 				delete n;
+
+				_size--;
 			}
 
 			int _count_child(node *n)
 			{
-				if (n->left == NULL && n->right == NULL)
+				if ((n->left == NULL || n->left == &_min) && (n->right == NULL || n->right == &_max))
 					return 0;
-				if (n->left != NULL && n->right != NULL)
+				if (n->left != NULL && n->left != &_min && n->right != NULL && n->right != &_max)
 					return 2;
 				return 1;
 			}
 
-			node *_get_min(node * n)
+			node *_get_max(node * n)
 			{
-				if (n != NULL)
+				if (n != NULL && n != &_max)
 				{
-					while (n->left != NULL)
-						n = n->left;
+					while (n->right != NULL && n->left != &_max)
+						n = n->right;
 				}
 				return n;
 			}
 
 			void _swap_nodes(node *n1, node *n2)
 			{
-				node *tmp;
-				node **n1_ptr = _get_ptr_to_node(n1);
-				node **n2_ptr = _get_ptr_to_node(n2);
-
-				tmp = n1->parent;
-				n1->parent = n2->parent;
-				n2->parent = tmp;
-
-				if (n1_ptr != NULL)
-					*n1_ptr = n2;
+				if (n2->_is_child(n1))
+					_swap_parent_child(n1, n2);
+				else if (n1->_is_child(n2))
+					_swap_parent_child(n2, n1);
 				else
-					_root = n2;
-				if (n2_ptr != NULL)
-					*n2_ptr = n1;
-				else
-					_root = n1;
+				{
+					node *tmp;
+					node **n1_ptr = _get_ptr_to_node(n1);
+					node **n2_ptr = _get_ptr_to_node(n2);
+				
+					tmp = n1->parent;
+					n1->parent = n2->parent;
+					n2->parent = tmp;
 
-				tmp = n1->left;
-				n1->left = n2->left;
-				n2->left = tmp;
+					if (n1_ptr != NULL)
+						*n1_ptr = n2;
+					else
+						_root = n2;
+					if (n2_ptr != NULL)
+						*n2_ptr = n1;
+					else
+						_root = n1;
 
-				tmp = n1->right;
-				n1->right = n2->right;
-				n2->right = tmp;
+					tmp = n1->left;
+					n1->left = n2->left;
+					n2->left = tmp;
+
+					tmp = n1->right;
+					n1->right = n2->right;
+					n2->right = tmp;
+				}
+				if (n1->left != NULL)
+					n1->left->parent = n1;
+				if (n1->right != NULL)
+					n1->right->parent = n1;
+
+				if (n2->left != NULL)
+					n2->left->parent = n2;
+				if (n2->right != NULL)
+					n2->right->parent = n2;
 
 				char color = n1->color;
 				n1->color = n2->color;
 				n2->color = color;
+			}
+
+			void _swap_parent_child(node *parent, node *child)
+			{
+				node *tmp;
+				node **parent_ptr = _get_ptr_to_node(parent);
+
+				if (parent_ptr != NULL)
+					*parent_ptr = child;
+				else
+					_root = child;
+				child->parent = parent->parent;
+				parent->parent = child;
+
+				tmp = parent->left;
+				parent->left = child->left;
+				child->left = tmp == child ? parent : tmp;
+
+				tmp = parent->right;
+				parent->right = child->right;
+				child->right = tmp == child ? parent : tmp;
 			}
 
 			node **_get_ptr_to_node(node *n)
@@ -355,43 +550,7 @@ template <typename T, typename _T>
 					_new->parent = _old->parent;
 			}
 
-			void _insert_by_val(value_type const& val)
-			{
-				if (_size == 0)
-				{
-					_insert_first_node(val);
-					return;
-				}
-
-				pointer data = _alloc.allocate(1);
-				_alloc.construct(data, val);
-
-				node *child = new node(_color::red, NULL, NULL, NULL, data);
-				node *parent = _get_pos_for_insert(val, _root);
-
-				if (parent->color == _color::min || parent->color == _color::max)
-					parent = parent->parent;
-				if (_less(val, *parent->data))
-				{
-					child->left = parent->left;
-					parent->left = child;
-					if (child->left != NULL)
-						child->left->parent = child;
-				}
-				else
-				{
-					child->right = parent->right;
-					parent->right = child;
-					if (child->right != NULL)
-						child->right->parent = child;
-				}
-				child->parent = parent;
-				_size++;
-
-				_balance_tree(child);
-			}
-
-			void _insert_first_node(value_type const& val)
+			iterator _insert_first_node(value_type const& val)
 			{
 				pointer data = _alloc.allocate(1);
 				_alloc.construct(data, val);
@@ -409,9 +568,11 @@ template <typename T, typename _T>
 				_max.right = NULL;
 
 				_size = 1;
+
+				return iterator(n);
 			}
 
-			void _balance_tree(node *child)
+			void _balance_after_insert(node *child)
 			{
 				if (child->parent == NULL || child->parent->color == _color::black)
 					return ;
@@ -426,7 +587,7 @@ template <typename T, typename _T>
 					uncle->color = _color::black;
 					if (grandpa->parent != NULL)
 						grandpa->color = _color::red;
-					_balance_tree(grandpa);
+					_balance_after_insert(grandpa);
 					return ;
 				}
 
@@ -440,6 +601,84 @@ template <typename T, typename _T>
 				child->_is_right() ? _rotate_left(grandpa) : _rotate_right(grandpa);
 				parent->color = _color::black;
 				grandpa->color = _color::red;
+			}
+
+			void _balance_after_erase(node *parent, node * son)
+			{
+				if (parent == NULL)
+					return ;
+
+				node *one_side_grandson = son->_is_right() ? son->right : son->left;
+				node *oppos_grandson = son->_is_right() ? son->left : son->right;
+
+				if (parent->color == _color::red)
+				{
+					if (one_side_grandson != NULL && one_side_grandson->color == _color::red)
+					{
+						_small_rotate(parent, son);
+						parent->color = _color::black;
+						son->color = _color::red;
+						one_side_grandson->color = _color::black;
+					}
+					else if (oppos_grandson != NULL && oppos_grandson->color == _color::red)
+					{
+						_greate_rotate(parent, son);
+						parent->color = _color::black;
+					}
+					else
+					{
+						parent->color = _color::black;
+						son->color = _color::red;
+					}
+				}
+				else if (son->color == _color::red)
+				{
+					_small_rotate(parent, son);
+					parent->color = _color::red;
+					son->color = _color::black;
+					_balance_after_erase(parent, oppos_grandson);
+				}
+				else
+				{
+					if (one_side_grandson != NULL && one_side_grandson->color == _color::red)
+					{
+						_small_rotate(parent, son);
+						one_side_grandson->color = _color::black;
+					}
+					else if (oppos_grandson != NULL && oppos_grandson->color == _color::red)
+					{
+						_greate_rotate(parent, son);
+						oppos_grandson->color = _color::black;
+					}
+					else
+					{
+						son->color = _color::red;
+						if (parent->parent != NULL)
+							_balance_after_erase(parent->parent, _get_brother(parent));
+					}
+				}
+			}
+
+			void _small_rotate(node *parent, node *son)
+			{
+				if (son->_is_left())
+					_rotate_right(parent);
+				else
+					_rotate_left(parent);
+			}
+
+			void _greate_rotate(node *parent, node *son)
+			{
+				if (son->_is_left())
+				{
+					_rotate_left(son);
+					_rotate_right(parent);
+				}
+				else
+				{
+					_rotate_right(son);
+					_rotate_left(parent);
+				}
 			}
 
 			void _rotate_right(node *n)
@@ -500,6 +739,26 @@ template <typename T, typename _T>
 				return NULL;
 			}
 
+			node *_get_son(node *n)
+			{
+				if (n == NULL)
+					return NULL;
+				if (n->left != NULL && n->left != &_min)
+					return n->left;
+				if (n->right != NULL && n->right != &_max)
+					return n->right;
+				return NULL;
+			}
+
+			node *_get_brother(node *n)
+			{
+				if (n == NULL || n->parent == NULL)
+					return NULL;
+				if (n->_is_right())
+					return n->parent->left == &_min ? NULL: n->parent->left;
+				return  n->parent->right == &_max ? NULL : n->parent->right;
+			}
+
 			node *_get_pos_for_insert(T const& val, node *curr)
 			{
 				if (curr->left == NULL && curr->right == NULL)
@@ -518,6 +777,8 @@ template <typename T, typename _T>
 
 			void _link_root_min_max(void)
 			{
+				_root = NULL;	
+
 				_min.right = &_max;
 				_max.left = &_min;
 

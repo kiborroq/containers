@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/07 11:24:36 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/06 16:22:10 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/08 23:34:46 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@
 // }
 
 #include <iostream>
-#include <vector>
+#include "vector.hpp"
 #include <algorithm>
 #include <list>
 #include <stack>
@@ -133,7 +133,7 @@ void print_tree(T begin, T end)
 
 int get_random_val(int)
 {
-	return -50 + rand() % 100;
+	return -500 + rand() % 1000;
 }
 
 int main ()
@@ -286,43 +286,57 @@ int main ()
 	// tree.insert(std::make_pair(105, 105));
 	// std::map<int, int>::iterator it;
 
-	
+	srand(time(NULL));
 
 	ft::_rb_tree<int> tree;
 
-	tree._insert_by_val(-155);
-	tree._insert_by_val(1035);
-	tree._insert_by_val(0);
-	tree._insert_by_val(128);
-	tree._insert_by_val(-999);
-	tree._insert_by_val(1055);
+	int count = 10000;
+	std::vector<int> nums;
 
-	// int count = 25;
+	while (count-- > 0)
+	{
+		int num = get_random_val(int());
+		tree._insert(num);
+		nums.push_back(num);
+	}
+	
+	std::cout << tree._size << std::endl;
+	std::cout << nums.size() << std::endl;
 
-	// while (count-- > 0)
-	// {
-	// 	int num = get_random_val(int());
-	// 	std::cout << num << " ";
-	// 	tree._insert_by_val(num);
-	// }
-	// std::cout << std::endl;
+	// print_tree(tree);
 
-	print_tree(tree);
+	ft::_rb_tree<int>::iterator tree_it;
+	std::vector<int>::iterator vec_it;
 
-	ft::_rb_tree<int>::iterator it;
+	while (nums.size() > 0)
+	{
+		int idx = 0 + rand() % nums.size();
+		tree_it = tree._find(nums.at(idx));
+		tree._erase_node(tree_it._tree);
+		vec_it = std::find(nums.begin(), nums.end(), nums.at(idx));
+		nums.erase(vec_it);
 
+		// print_tree(tree);
+	}
 
-	// std::cout << (*it).first << std::endl;
-	// std::cout << (*(++it)).first << std::endl;
-	// std::cout << (*(++it)).first << std::endl;
-	// std::cout << (*(++it)).first << std::endl;
-	// std::cout << (*(++it)).first << std::endl;
-	// std::cout << (*(++it)).first << std::endl;
-	// std::cout << (*(++it)).first << std::endl;
+	count = 100;
+	while (count-- > 0)
+	{
+		int num = get_random_val(int());
+		tree._insert(num);
+		nums.push_back(num);
+	}
 
-	it = tree._find(1035);
-	tree._erase_node(it._tree);
-	print_tree(tree);
+	while (nums.size() > 0)
+	{
+		int idx = 0 + rand() % nums.size();
+		tree_it = tree._find(nums.at(idx));
+		tree._erase_node(tree_it._tree);
+		vec_it = std::find(nums.begin(), nums.end(), nums.at(idx));
+		nums.erase(vec_it);
+
+		// print_tree(tree);
+	}
 
 	// char c = _color::BLACK;
 
