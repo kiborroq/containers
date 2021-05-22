@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/16 19:30:50 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 12:44:11 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 00:13:09 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,9 +62,9 @@ void list_tests(void)
 	test1.DoTests();
 	std::cout << std::endl;
 
-	print_type("HUMAN");
-	ListTests<Human, std::list<Human>, ft::list<Human> > test4;
-	test4.DoTests();
+	// print_type("HUMAN");
+	// ListTests<Human, std::list<Human>, ft::list<Human> > test4;
+	// test4.DoTests();
 }
 
 void map_tests(void)

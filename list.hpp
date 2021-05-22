@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/12 22:32:52 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 13:15:00 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 00:13:47 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LIST_HPP
 
 # include "iterator.hpp"
+# include "utils.hpp"
 # include <memory>
 # include <limits>
 
@@ -39,30 +40,6 @@ namespace ft
 			{ }
 			
 			_node(_node const& n)
-				: data(n.data), next(n.next), prev(n.next)
-			{ }
-	};
-
-	template <typename T>
-	struct	_node_l
-	{
-		private:
-			typedef T pointer;
-
-		public:
-			pointer	data;
-			_node_l<T>	*next;
-			_node_l<T>	*prev;
-
-			_node_l(void)
-				: data(NULL), next(NULL), prev(NULL)
-			{ }
-			
-			_node_l(pointer data, _node_l *next, _node_l *prev)
-				: data(data), next(next), prev(prev)
-			{ }
-			
-			_node_l(_node_l const& n)
 				: data(n.data), next(n.next), prev(n.next)
 			{ }
 	};
@@ -173,37 +150,33 @@ namespace ft
 
 		private:
 			typedef _node<value_type> node;
-			typedef typename allocator_type::template rebind<_node_l<value_type> >::other _node_allocator;
 
 		private:
 			size_type	_size;
-			
+
 		protected:
 			allocator_type	_alloc;
 			node			_begin;
 			node			_end;
-		
-		private:
-			_node_allocator	_node_alloc;
 
 		public:
 			explicit list(allocator_type const& alloc = allocator_type())
-				: _size(0), _alloc(alloc), _node_alloc(_node_allocator())
+				: _size(0), _alloc(alloc)
 			{ _link_begin_end(); }
 
 			explicit list(size_type n, value_type const& val = value_type(),
                 allocator_type const& alloc = allocator_type())
-				: _size(0), _alloc(alloc), _node_alloc(_node_allocator())
+				: _size(0), _alloc(alloc)
 			{ _link_begin_end(); insert(begin(), n, val); }
 
 			template <class InputIterator>
   			list(InputIterator first, InputIterator last,
          		allocator_type const& alloc = allocator_type())
-				: _size(0), _alloc(alloc), _node_alloc(_node_allocator())
+				: _size(0), _alloc(alloc)
 			{ _link_begin_end(); insert(begin(), first, last); }
 
 			list(list const& x)
-				: _size(0), _alloc(x._alloc), _node_alloc(x._node_alloc)
+				: _size(0), _alloc(x._alloc)
 			{ _link_begin_end(); *this = x; }
 
 			list & operator=(list const & x)
@@ -238,7 +211,7 @@ namespace ft
 			bool empty(void) const { return _size == 0; }
 			size_type size(void) const { return _size; }
 			size_type max_size(void) const
-			{ return _node_alloc.max_size(); }
+			{ return std::numeric_limits<difference_type>::max() / ( sizeof(value_type) + sizeof(node) ); }
 
 
 			/*
@@ -457,13 +430,14 @@ namespace ft
 
 					while (first != last)
 					{
-						while ( first > x.begin() )
+						while (x.size() > 0 && *x.begin() < *first )
 							splice(first, x, x.begin());
 						first++;				
 					}
 					if (x.size() != 0)
-						splice(last, x.begin(), x.end());
+						splice(last, x, x.begin(), x.end());
 				}
+				x._size = 0;
 			}
 
 			template <typename Compare>
@@ -476,19 +450,22 @@ namespace ft
 
 					while (first != last)
 					{
-						while ( comp( *x.begin(), *first ) )
+						while ( x.size() > 0 && comp( *x.begin(), *first ) )
 							splice(first, x, x.begin());
-						first++;				
+						first++;
 					}
 					if (x.size() != 0)
-						splice(last, x.begin(), x.end());
+						splice(last, x, x.begin(), x.end());
 				}
+				x._size = 0;
 			}
 
 			void sort(void)
-			{
-						
-			}
+			{ _merge_sort(*this, ft::less<value_type>()); }
+
+			template <typename Compare>
+			void sort(Compare comp)
+			{ _merge_sort(*this, comp); }
 
 			void reverse(void)
 			{
@@ -524,11 +501,6 @@ namespace ft
 				pointer p = _alloc.allocate(1);
 				_alloc.construct(p, val);
 				node *n = new node(p, next, prev);
-
-				typename _node_allocator::pointer n1 = _node_alloc.allocate(1);
-				_node_alloc.construct(n1, _node_l<value_type>(val, NULL, NULL));
-				// node *n = new node(p, next, prev);
-
 				prev->next = n;
 				next->prev = n;
 				_size++;
@@ -547,37 +519,31 @@ namespace ft
 				return next;
 			}
 
-			void _add_nodes(node *to_prev, node *to_next, node *from_first, node * from_last)
+			template <typename Compare>
+			void _merge_sort(list & full, Compare comp)
 			{
-				to_prev->next = from_first;
-				from_first->prev = to_prev;
-				
-				from_last->next = to_next;
-				to_next->prev = from_last;
+				if (full.size() < 2)
+					return ;
+
+				list first_half(_alloc);
+				list second_half(_alloc);
+
+				_split_full(full, first_half, second_half);
+
+				_merge_sort(first_half, comp);
+				_merge_sort(second_half, comp);
+
+				first_half.merge(second_half, comp);
+				full.splice(full.begin(), first_half);
 			}
 
-			node *_merge_slices(node *first, node *second)
+			void _split_full(list & full, list & first_half, list & second_half)
 			{
-				node *begin = first->data < second->data ? first : second;
-				node *curr = begin;
+				iterator half = full.begin();
+				ft::advance(half, full.size() / 2);
 
-				first = first->next;
-				second = second->next;
-				while (first != NULL)
-				{
-					while (second != NULL && second->data < first->data)
-					{
-						curr = second;
-						second = curr->next;
-						curr = curr->next;
-					}
-					curr = first;
-					first = curr->next;
-					curr = curr->next;
-				}
-				if (second != NULL)
-					curr->next = second;
-				return begin;
+				first_half.splice(first_half.begin(), full, full.begin(), half);
+				second_half.splice(second_half.begin(), full);
 			}
 
 			void _swap_nodelinks(node *n)

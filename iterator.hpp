@@ -6,14 +6,12 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/11 20:14:35 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 11:47:04 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 00:15:48 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
-
-# include <cstddef>
 
 namespace ft
 {
@@ -32,6 +30,13 @@ namespace ft
 		typedef Reference	reference;
 		typedef Category	iterator_category;
 	};
+
+	template <class InputIterator, class Distance>
+	void advance(InputIterator & it, Distance n)
+	{
+		while (n-- > 0)
+			it++;
+	}
 
 	template <typename InputIterator>
 	typename InputIterator::difference_type distance(InputIterator first, InputIterator last)

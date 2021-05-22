@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/17 13:45:00 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 12:13:32 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 00:18:17 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,16 +70,25 @@ std::string get_info_cont(itCont const& c)
 
 void print_container_header(std::string header)
 {
-	std::cout << "\033[1;35m" << std::setfill('=') << std::setw(header.size() + 46) << "\033[0m" << std::endl;
-	std::cout << "\033[1;35m=" << std::setfill(' ') <<  std::setw(20 + header.size());
-	std::cout << header << std::setw(25) << "=\033[0m" << std::endl;
-	std::cout << "\033[1;35m" << std::setfill('=') << std::setw(header.size() + 46) << "\033[0m" << std::endl;
+	int size = 50;
+
+	std::cout << "\033[1;35m" << std::setfill('=') << std::setw(size) << "\033[0m" << std::endl;
+	
+	std::cout << "\033[1;35m=" << std::setfill(' ') <<  std::setw((size - 2 - header.size()) / 2) << "\033[0m";
+	std::cout << "\033[1;35m" << header;
+	std::cout << "\033[1;35m" << std::setfill(' ') <<  std::setw( size - (size - 2 - header.size()) / 2 - header.size() - 1) << "=" << std::endl;
+
+	std::cout << "\033[1;35m" << std::setfill('=') << std::setw(size) << "\033[0m" << std::endl;
 	std::cout << std::endl;
 }
 
 void print_type(std::string header)
 {
-	std::cout << "\033[1;36m=================== " << header << " ===================\033[0m" << std::endl;
+	int size = 50;
+
+	std::cout << "\033[1;36m" << std::setfill('=') << std::setw((size - 2 - header.size()) / 2) << "\033[0m"; std::cout.flush();
+	std::cout << " " << "\033[1;36m" << header << " "; std::cout.flush();
+	std::cout << "\033[1;36m" << std::setfill('=') << std::setw( size - (size - 2 - header.size()) / 2 - header.size() + 2) << "\033[0m" << std::endl;
 }
 
 void print_test_res(std::string res)
@@ -118,7 +127,7 @@ std::ostream & operator<<(std::ostream & out, Human const & h)
 
 int get_random_val(int)
 {
-	return 5 + rand() % 25;
+	return 5 + rand() % 100;
 }
 
 std::string get_random_val(std::string)
@@ -127,7 +136,7 @@ std::string get_random_val(std::string)
 	std::string	str;
 	std::string	charSet = "abcdefghijklmnopqrstuvwxyzABSCDEFGHIJKLMOPQRSTUVWXYZ";
 
-	strLength = 5 + rand() % 5;
+	strLength = get_random_val(int());
 	str.resize(strLength);
 	for (int i = 0; i < strLength; i++)
 		str[i] = charSet[rand() % charSet.length()];
@@ -630,6 +639,19 @@ class ListTests
 				return false; 
 		}
 
+		void fill_conts(ftCont ft, stdCont std)
+		{
+			int times = get_random_val(int());
+
+			T val;
+			while (times-- > 0)
+			{
+				val = get_random_val(T());
+				std.push_back( val );
+				ft.push_back( val );					
+			}
+		}
+
 		static bool equals(T const& first, T const& second) { return first == second; }
 
 		void DoTests(void)
@@ -713,14 +735,7 @@ class ListTests
 
 			print_func_name("push_back");
 			{
-				int times = get_random_val(int());
-				T val;
-				while (times-- > 0)
-				{
-					val = get_random_val(T());
-					std1.push_back( val );
-					ft1.push_back( val );					
-				}
+				fill_conts(ft1, std1);
 				print_result(std1, ft1);
 			}
 			std::cout << std::endl;
@@ -748,6 +763,7 @@ class ListTests
 			print_func_name("push_front");
 			{
 				int times = get_random_val(int());
+				
 				T val;
 				while (times-- > 0)
 				{
@@ -1061,14 +1077,45 @@ class ListTests
 			}
 			std::cout << std::endl;
 
+			fill_conts(ft1, std1);
+
 			print_func_name("sort");
 			{
-				
+				ftCont ft2;
+				stdCont std2;
+
+				ft2.sort();
+				std2.sort();
+				print_result(std2, ft2);
+
+				ft1.sort(std::greater<T>());
+				std1.sort(std::greater<T>());
+				print_result(std1, ft1);
+
+				ft1.sort();
+				std1.sort();
+				print_result(std1, ft1);
 			}
 			std::cout << std::endl;
 
 			print_func_name("merge");
 			{
+				ftCont ft2;
+				stdCont std2;
+				fill_conts(ft2, std2);
+
+				ft2.merge(ft2);
+				std2.merge(std2);
+				print_result(std2, ft2);
+
+				ft1.merge(ft2);
+				std1.merge(std2);
+				print_result(std1, ft1);
+
+				fill_conts(ft2, std2);
+				ft1.merge(ft2, std::greater<T>());
+				std1.merge(std2, std::greater<T>());
+				print_result(std1, ft1);
 				
 			}
 			std::cout << std::endl;
@@ -1190,8 +1237,6 @@ class MapSetTests
 				ftVal ft_v = get_random_val(ftVal());
 				stdVal std_v = copy_val(ft_v);
 				Key k = get_key(ft_v);
-
-				std::cout << "key=" << k << "   ";
 
 				ft_m.insert(ft_v);
 				std_m.insert(std_v);

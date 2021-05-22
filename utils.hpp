@@ -6,12 +6,14 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/23 10:09:38 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 11:55:57 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 00:13:54 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef UTILS_HPP
 # define UTILS_HPP
+
+# include <limits>
 
 namespace ft
 {
@@ -172,7 +174,7 @@ namespace ft
 
 	}; // struct _rb_node
 
-template <typename T, typename _T>
+	template <typename T, typename _T>
 	class _rb_tree_iterator
 	{
 		public:
@@ -389,7 +391,7 @@ template <typename T, typename _T>
 
 			size_type _max_size(void) const
 			{
-				return std::numeric_limits<difference_type>::max() / (sizeof(node) - sizeof(value_type *) + sizeof(value_type));
+				return std::numeric_limits<difference_type>::max() / (sizeof(node) + sizeof(value_type));
 			}
 
 			/*
