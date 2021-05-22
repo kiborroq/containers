@@ -3,24 +3,157 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/12 22:32:52 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/10 00:13:30 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/22 13:15:00 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIST_HPP
 # define LIST_HPP
 
+# include "iterator.hpp"
 # include <memory>
 # include <limits>
-# include "random_access_iterator.hpp"
-# include "list_iterator.hpp"
-# include "iterator.hpp"
 
 namespace ft
 {
+	template <typename T>
+	struct	_node
+	{
+		private:
+			typedef T * pointer;
+
+		public:
+			pointer	data;
+			_node<T>	*next;
+			_node<T>	*prev;
+
+			_node(void)
+				: data(NULL), next(NULL), prev(NULL)
+			{ }
+			
+			_node(pointer data, _node *next, _node *prev)
+				: data(data), next(next), prev(prev)
+			{ }
+			
+			_node(_node const& n)
+				: data(n.data), next(n.next), prev(n.next)
+			{ }
+	};
+
+	template <typename T>
+	struct	_node_l
+	{
+		private:
+			typedef T pointer;
+
+		public:
+			pointer	data;
+			_node_l<T>	*next;
+			_node_l<T>	*prev;
+
+			_node_l(void)
+				: data(NULL), next(NULL), prev(NULL)
+			{ }
+			
+			_node_l(pointer data, _node_l *next, _node_l *prev)
+				: data(data), next(next), prev(prev)
+			{ }
+			
+			_node_l(_node_l const& n)
+				: data(n.data), next(n.next), prev(n.next)
+			{ }
+	};
+
+	template <typename T, typename _T>
+	class list_iterator
+	{
+		public:
+			typedef ptrdiff_t	difference_type;
+			typedef T			value_type;
+			typedef T *			pointer;
+			typedef T &			reference;
+			typedef bidirectional_iterator_tag iterator_category;
+
+		private:
+			typedef _node<_T> node;
+
+		public:
+			node *_list;
+		
+		private:
+			value_type _empty;
+
+		public:
+			list_iterator(void)
+				: _empty(value_type())
+			{ }
+			
+			list_iterator(node *p)
+				: _list(p), _empty(value_type())
+			{ }
+			
+			list_iterator(list_iterator const& li)
+				: _list(li._list), _empty(value_type())
+			{ }
+			
+			~list_iterator(void) { }
+
+
+			list_iterator & operator=(list_iterator const& li)
+			{ _list = li._list; return *this; }
+			
+
+			bool operator==(list_iterator const& li)
+			{ return _list == li._list; }
+			
+			bool operator!=(list_iterator const& li)
+			{ return _list != li._list; }
+
+
+			reference & operator*(void)
+			{
+				if (_list->data != NULL)
+					return *_list->data;
+				return _empty;
+			}
+
+			pointer operator->(void)
+			{ return _list->data; }
+
+
+			list_iterator & operator++(void)
+			{
+				if (_list->next != NULL)
+					_list = _list->next;
+				return *this;
+			}
+
+			list_iterator operator++(int)
+			{
+				if (_list->next != NULL)
+					_list = _list->next;
+				return list_iterator(_list->prev);
+			}
+
+
+			list_iterator & operator--(void)
+			{
+				if (_list->prev != NULL)
+					_list = _list->prev;
+				return *this;
+			}
+
+			list_iterator operator--(int)
+			{
+				if (_list->prev != NULL)
+					_list = _list->prev;
+				return list_iterator(_list->next);
+			}
+	};
+
 	template < typename T, typename Alloc = std::allocator<T> >
 	class list
 	{
@@ -40,33 +173,37 @@ namespace ft
 
 		private:
 			typedef _node<value_type> node;
+			typedef typename allocator_type::template rebind<_node_l<value_type> >::other _node_allocator;
 
 		private:
 			size_type	_size;
-
+			
 		protected:
 			allocator_type	_alloc;
 			node			_begin;
 			node			_end;
+		
+		private:
+			_node_allocator	_node_alloc;
 
 		public:
 			explicit list(allocator_type const& alloc = allocator_type())
-				: _size(0), _alloc(alloc)
+				: _size(0), _alloc(alloc), _node_alloc(_node_allocator())
 			{ _link_begin_end(); }
 
 			explicit list(size_type n, value_type const& val = value_type(),
                 allocator_type const& alloc = allocator_type())
-				: _size(0), _alloc(alloc)
+				: _size(0), _alloc(alloc), _node_alloc(_node_allocator())
 			{ _link_begin_end(); insert(begin(), n, val); }
 
 			template <class InputIterator>
   			list(InputIterator first, InputIterator last,
          		allocator_type const& alloc = allocator_type())
-				: _size(0), _alloc(alloc)
+				: _size(0), _alloc(alloc), _node_alloc(_node_allocator())
 			{ _link_begin_end(); insert(begin(), first, last); }
 
 			list(list const& x)
-				: _size(0), _alloc(x._alloc)
+				: _size(0), _alloc(x._alloc), _node_alloc(x._node_alloc)
 			{ _link_begin_end(); *this = x; }
 
 			list & operator=(list const & x)
@@ -101,9 +238,7 @@ namespace ft
 			bool empty(void) const { return _size == 0; }
 			size_type size(void) const { return _size; }
 			size_type max_size(void) const
-			{
-				return std::numeric_limits<difference_type>::max() / (sizeof(node) - sizeof(value_type *) + sizeof(value_type));
-			}
+			{ return _node_alloc.max_size(); }
 
 
 			/*
@@ -371,6 +506,13 @@ namespace ft
 				}
 			}
 
+			/*
+			**Member functions - OBSERVERS
+			*/
+
+			allocator_type get_allocator(void) const
+			{ return _alloc; }
+
 		private:
 
 			/*
@@ -382,6 +524,11 @@ namespace ft
 				pointer p = _alloc.allocate(1);
 				_alloc.construct(p, val);
 				node *n = new node(p, next, prev);
+
+				typename _node_allocator::pointer n1 = _node_alloc.allocate(1);
+				_node_alloc.construct(n1, _node_l<value_type>(val, NULL, NULL));
+				// node *n = new node(p, next, prev);
+
 				prev->next = n;
 				next->prev = n;
 				_size++;
@@ -463,10 +610,10 @@ namespace ft
 	*/
 
 	template <typename T, typename Alloc>
-	void swap(list<T,Alloc>& x, list<T,Alloc>& y) { x.swap(y); }
+	void swap(ft::list<T,Alloc>& x, ft::list<T,Alloc>& y) { x.swap(y); }
 
 	template <typename T, typename Alloc>
-	bool operator==(list<T,Alloc> const& lhs, list<T,Alloc> const& rhs)
+	bool operator==(ft::list<T,Alloc> const& lhs, ft::list<T,Alloc> const& rhs)
 	{
 		if (lhs.size() == rhs.size())
 		{
@@ -488,10 +635,10 @@ namespace ft
 	}
 
 	template <typename T, typename Alloc>
-	bool operator!=(list<T,Alloc> const& lhs, list<T,Alloc> const& rhs) { return !(lhs == rhs); }
+	bool operator!=(ft::list<T,Alloc> const& lhs, ft::list<T,Alloc> const& rhs) { return !(lhs == rhs); }
 
 	template <typename T, typename Alloc>
-	bool operator<(list<T,Alloc> const& lhs, list<T,Alloc> const& rhs)
+	bool operator<(ft::list<T,Alloc> const& lhs, ft::list<T,Alloc> const& rhs)
 	{
 		typedef typename list<T, Alloc>::const_iterator const_iterator;
 
@@ -512,14 +659,14 @@ namespace ft
 	}
 
 	template <typename T, typename Alloc>
-	bool operator>(list<T,Alloc> const& lhs, list<T,Alloc> const& rhs) { return !(lhs < rhs); }
+	bool operator>(ft::list<T,Alloc> const& lhs, ft::list<T,Alloc> const& rhs) { return !(lhs < rhs) && lhs != rhs; }
 
 	template <typename T, typename Alloc>
-	bool operator<=(list<T,Alloc> const& lhs, list<T,Alloc> const& rhs) { return !(lhs > rhs); }
+	bool operator<=(ft::list<T,Alloc> const& lhs, ft::list<T,Alloc> const& rhs) { return !(lhs > rhs); }
 
 	template <typename T, typename Alloc>
-	bool operator>=(list<T,Alloc> const& lhs, list<T,Alloc> const& rhs) { return !(lhs < rhs); }
+	bool operator>=(ft::list<T,Alloc> const& lhs, ft::list<T,Alloc> const& rhs) { return !(lhs < rhs); }
 
 } // namespace ft
 
-#endif
+#endif // LIST_HPP

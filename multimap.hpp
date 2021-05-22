@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map.hpp                                            :+:      :+:    :+:   */
+/*   multimap.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/23 14:49:59 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 12:06:10 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/22 12:08:06 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MAP_HPP
-# define MAP_HPP 
+#ifndef MULTIMAP_HPP
+# define MULTIMAP_HPP 
 
 # include "iterator.hpp"
 # include "utils.hpp"
@@ -24,7 +24,7 @@ namespace ft
 				typename Compare = ft::less<Key>,
 				typename Alloc = std::allocator< ft::pair<Key, T> >
 			>
-	class map
+	class multimap
 	{
 		public:
 			typedef Key					key_type;
@@ -51,7 +51,7 @@ namespace ft
 
 			class value_compare : ft::binary_function<value_type, value_type, bool>
 			{
-				friend map<key_type, mapped_type, Compare, allocator_type>;
+				friend multimap<key_type, mapped_type, Compare, allocator_type>;
 
 				protected:
 					Compare comp;
@@ -72,26 +72,26 @@ namespace ft
 			tree _map;
 
 		public:
-			explicit map(key_compare const& comp = key_compare(),
+			explicit multimap(key_compare const& comp = key_compare(),
             	allocator_type const& alloc = allocator_type())
 				: _comp(comp), _alloc(alloc), _map(_pair_comp(), _alloc)
 			{ }
 
 			template <class InputIterator>
-			map(InputIterator first, InputIterator last,
+			multimap(InputIterator first, InputIterator last,
 				key_compare const& comp = key_compare(),
 				allocator_type const& alloc = allocator_type())
 				: _comp(comp), _alloc(alloc), _map(first, last, _pair_comp(), _alloc)
 			{ }
 
-			map(map const& mp)
+			multimap(multimap const& mp)
 				: _comp(mp._comp), _alloc(mp._alloc), _map(mp._map)
 			{ }
 			
-			~map(void)
+			~multimap(void)
 			{ }
 
-			map operator=(map const& mp)
+			multimap operator=(multimap const& mp)
 			{ _map = mp._map; return *this; }
 
 
@@ -121,32 +121,18 @@ namespace ft
 			bool empty(void) const
 			{ return _map._size == 0; }
 
-			
-			/*
-			**Member functions - ELEMENT ACCESS
-			*/
-
-			mapped_type & operator[](key_type const& k)
-			{ return  (*((this->insert(ft::make_pair(k, mapped_type()))).first)).second; }
-
 
 			/*
 			**Member functions - MODIFIERS
 			*/
 
-			pair<iterator, bool> insert(value_type const& val)
-			{
-				iterator pos = _map._find(val);
-
-				if (pos._tree != NULL && _map._equal_to(*pos._tree->data, val))
-					return ft::make_pair(pos, false);
-				return ft::make_pair(_map._insert(val), true);
-			}
+			iterator insert(value_type const& val)
+			{ return _map._insert(val); }
 
 			iterator insert(iterator position, value_type const& val)
 			{
 				(void)position;
-				return (insert(val)).first;
+				return insert(val);
 			}
 
 			template <typename InputIterator>
@@ -165,7 +151,7 @@ namespace ft
 			size_type erase(key_type const& k)
 			{ return _map._erase(ft::make_pair(k, mapped_type())); }
 
-			void swap(map & x)
+			void swap(multimap & x)
 			{ _map._swap(x._map); }
 
 			void clear(void)
@@ -194,7 +180,7 @@ namespace ft
 			{
 				iterator pos = _map._find(ft::make_pair(k, mapped_type()));
 				
-				if (pos._tree != NULL && _map._equal_to(*pos._tree->data, ft::make_pair(k, mapped_type())))
+				if (_map._equal_to(*pos._tree->data, ft::make_pair(k, mapped_type())))
 					return pos;
 				return end();
 			}
@@ -228,9 +214,8 @@ namespace ft
 
 			ft::pair<const_iterator, const_iterator> equal_range (key_type const& k) const
 			{ return (ft::make_pair(lower_bound(k), upper_bound(k))); }
-
 	};
 
 }; //namespace ft
 
-#endif
+#endif // MULTIMAP_HPP

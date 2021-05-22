@@ -6,14 +6,14 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/06 20:41:55 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/04/19 19:19:49 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/22 12:05:46 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
-# include "random_access_iterator.hpp"
+# include "iterator.hpp"
 # include <memory>
 # include <stdexcept>
 # include <cstddef>
@@ -248,6 +248,13 @@ namespace ft
 				_cap = cap_tmp;
 			}
 
+			/*
+			**Member functions - OBSERVERS
+			*/
+
+			allocator_type get_allocator(void) const
+			{ return _alloc; }
+
 			private:
 
 				/*
@@ -315,10 +322,10 @@ namespace ft
 	*/
 
 	template <typename T, typename Alloc>
-	void swap(vector<T,Alloc>& x, vector<T,Alloc>& y) { x.swap(y); }
+	void swap(ft::vector<T,Alloc>& x, ft::vector<T,Alloc>& y) { x.swap(y); }
 
 	template <typename T, typename Alloc>
-	bool operator==(vector<T,Alloc> const& lhs, vector<T,Alloc> const& rhs)
+	bool operator==(ft::vector<T,Alloc> const& lhs, ft::vector<T,Alloc> const& rhs)
 	{
 		if (lhs.size() == rhs.size())
 		{
@@ -337,10 +344,10 @@ namespace ft
 	}
 
 	template <typename T, typename Alloc>
-	bool operator!=(vector<T,Alloc> const& lhs, vector<T,Alloc> const& rhs) { return !(lhs == rhs); }
+	bool operator!=(ft::vector<T,Alloc> const& lhs, ft::vector<T,Alloc> const& rhs) { return !(lhs == rhs); }
 
 	template <typename T, typename Alloc>
-	bool operator<(vector<T,Alloc> const& lhs, vector<T,Alloc> const& rhs)
+	bool operator<(ft::vector<T,Alloc> const& lhs, ft::vector<T,Alloc> const& rhs)
 	{
 		typedef typename vector<T, Alloc>::size_type size_type;
 
@@ -356,13 +363,13 @@ namespace ft
 	}
 
 	template <typename T, typename Alloc>
-	bool operator>(vector<T,Alloc> const& lhs, vector<T,Alloc> const& rhs) { return !(lhs < rhs); }
+	bool operator>(ft::vector<T,Alloc> const& lhs, ft::vector<T,Alloc> const& rhs) { return !(lhs < rhs) && lhs != rhs; }
 
 	template <typename T, typename Alloc>
-	bool operator<=(vector<T,Alloc> const& lhs, vector<T,Alloc> const& rhs) { return !(lhs > rhs); }
+	bool operator<=(ft::vector<T,Alloc> const& lhs, ft::vector<T,Alloc> const& rhs) { return !(lhs > rhs); }
 
 	template <typename T, typename Alloc>
-	bool operator>=(vector<T,Alloc> const& lhs, vector<T,Alloc> const& rhs) { return !(lhs < rhs); }
+	bool operator>=(ft::vector<T,Alloc> const& lhs, ft::vector<T,Alloc> const& rhs) { return !(lhs < rhs); }
 };
 
-#endif
+#endif // VECTOR_HPP

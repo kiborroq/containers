@@ -3,25 +3,41 @@
 /*                                                        :::      ::::::::   */
 /*   tests.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/16 19:30:50 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/10 02:02:05 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/22 12:44:11 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <string>
-#include <iostream>
 #include <list>
 #include "list.hpp"
+
 #include <vector>
 #include "vector.hpp"
+
+#include <map>
+#include "map.hpp"
+#include "multimap.hpp"
+
+#include <set>
+#include "set.hpp"
+#include "multiset.hpp"
+
+#include <stack>
+#include "stack.hpp"
+
+#include <queue>
+#include "queue.hpp"
+
+#include "ForTests.hpp"
+
+#include <string>
+#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <sstream>
 #include <algorithm>
-#include "ForTests.hpp"
-
 
 void vector_tests(void)
 {
@@ -31,16 +47,6 @@ void vector_tests(void)
 	VectorTests<int, std::vector<int>, ft::vector<int> > test1;
 	test1.DoTests();
 	std::cout << std::endl;
-
-	// print_type("STRING");
-	// VectorTests<std::string, std::vector<std::string>, ft::vector<std::string> > test2;
-	// test2.DoTests();
-	// std::cout << std::endl;
-
-	// print_type("CHAR");
-	// VectorTests<char, std::vector<char>, ft::vector<char> > test3;
-	// test3.DoTests();
-	// std::cout << std::endl;
 
 	// print_type("HUMAN");
 	// VectorTests<Human, std::vector<Human>, ft::vector<Human> > test4;
@@ -56,19 +62,9 @@ void list_tests(void)
 	test1.DoTests();
 	std::cout << std::endl;
 
-	// print_type("STRING");
-	// ListTests<std::string, std::list<std::string>, ft::list<std::string> > test2;
-	// test2.DoTests();
-	// std::cout << std::endl;
-
-	// print_type("CHAR");
-	// ListTests<char, std::list<char>, ft::list<char> > test3;
-	// test3.DoTests();
-	// std::cout << std::endl;
-
-	// print_type("HUMAN");
-	// ListTests<Human, std::list<Human>, ft::list<Human> > test4;
-	// test4.DoTests();
+	print_type("HUMAN");
+	ListTests<Human, std::list<Human>, ft::list<Human> > test4;
+	test4.DoTests();
 }
 
 void map_tests(void)
@@ -76,22 +72,104 @@ void map_tests(void)
 	print_container_header("MAP");
 
 	print_type("INT-STR");
-	MapTests<int, std::string> test1;
+	MapSetTests<ft::map<int, std::string>, std::map<int, std::string>, int> test1;
+	test1.DoTests();
+	test1.accessOperator();
+	std::cout << std::endl;
+
+	// print_type("CHR-HUM");
+	// MapSetTests<ft::map<char, Human>, std::map<char, Human>, char> test3;
+	// test3.accessOperator();
+	// test3.DoTests();
+}
+
+void multimap_tests(void)
+{
+	print_container_header("MULTIMAP");
+
+	print_type("INT-STR");
+	MapSetTests<ft::multimap<int, std::string>, std::multimap<int, std::string>, int> test1;
 	test1.DoTests();
 	std::cout << std::endl;
 
-	// print_type("STR-INT");
-	// MapTests<std::string, int> test2;
-	// test1.DoTests();
-	// std::cout << std::endl;
-
-	// print_type("CHR-INT");
-	// MapTests<char, int> test3;
-	// test1.DoTests();
+	// print_type("CHR-HUM");
+	// MapSetTests<ft::multimap<char, Human>, std::multimap<char, Human>, char> test3;
+	// test3.DoTests();
 }
 
-#include "_rb_tree.hpp"
-#include "map.hpp"
+void set_tests(void)
+{
+	print_container_header("SET");
+
+	print_type("INTEGER");
+	MapSetTests<ft::set<int>, std::set<int>, int> test1;
+	test1.DoTests();
+	std::cout << std::endl;
+
+	// print_type("HUMAN");
+	// MapSetTests<ft::set<Human>, std::set<Human>, Human> test4;
+	// test4.DoTests();
+}
+
+void multiset_tests(void)
+{
+	print_container_header("MULTISET");
+
+	print_type("INTEGER");
+	MapSetTests<ft::multiset<int>, std::multiset<int>, int> test1;
+	test1.DoTests();
+	std::cout << std::endl;
+
+	// print_type("HUMAN");
+	// MapSetTests<ft::multiset<Human>, std::multiset<Human>, Human> test4;
+	// test4.DoTests();
+}
+
+void stack_tests(void)
+{
+	print_container_header("STACK");
+
+	print_type("VECT-INT");
+	StakcQueueTests< ft::stack< int, ft::vector<int> >, std::stack< int, std::vector<int> > > test1;
+	test1.DoTests();
+	test1.stackAccess();
+	std::cout << std::endl;
+
+	// print_type("VECT-HUM");
+	// StakcQueueTests< ft::stack< Human, ft::vector<Human> >, std::stack< Human, std::vector<Human> > > test2;
+	// test2.DoTests();
+	// test2.stackAccess();
+	// std::cout << std::endl;
+
+	print_type("LIST-INT");
+	StakcQueueTests< ft::stack< int, ft::list<int> >, std::stack< int, std::list<int> > > test3;
+	test3.DoTests();
+	test3.stackAccess();
+	std::cout << std::endl;
+
+	// print_type("LIST-HUM");
+	// StakcQueueTests< ft::stack< Human, ft::list<Human> >, std::stack< Human, std::list<Human> > > test4;
+	// test4.DoTests();
+	// test4.stackAccess();
+	// std::cout << std::endl;
+}
+
+void queue_tests(void)
+{
+	print_container_header("QUEUE");
+
+	print_type("LIST-INT");
+	StakcQueueTests< ft::queue< int, ft::list<int> >, std::queue< int, std::list<int> > > test1;
+	test1.DoTests();
+	test1.queueAccess();
+	std::cout << std::endl;
+
+	// print_type("LIST-HUM");
+	// StakcQueueTests< ft::queue< Human, ft::list<Human> >, std::queue< Human, std::list<Human> > > test2;
+	// test2.DoTests();
+	// test2.queueAccess();
+	// std::cout << std::endl;
+}
 
 int main(void)
 {
@@ -100,6 +178,10 @@ int main(void)
 	vector_tests();
 	list_tests();
 	map_tests();
-
+	multimap_tests();
+	set_tests();
+	multiset_tests();
+	stack_tests();
+	queue_tests();
 	return 0;
 }

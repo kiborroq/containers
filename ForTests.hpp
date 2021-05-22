@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ForTests.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/17 13:45:00 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/10 01:56:59 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/22 12:13:32 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,14 +31,16 @@
 template <typename Key, typename Val>
 std::ostream & operator<<(std::ostream & out, ft::pair<Key, Val> const & p) 
 {
-	out << p.first << "-" << p.second;
+	// out << p.first << "-" << p.second;
+	out << p.first;
 	return (out);
 }
 
 template <typename Key, typename Val>
 std::ostream & operator<<(std::ostream & out, std::pair<Key, Val> const & p) 
 {
-	out << p.first << "-" << p.second;
+	// out << p.first << "-" << p.second;
+	out << p.first;
 	return (out);
 }
 
@@ -116,7 +118,7 @@ std::ostream & operator<<(std::ostream & out, Human const & h)
 
 int get_random_val(int)
 {
-	return 5 + rand() % 500;
+	return 5 + rand() % 25;
 }
 
 std::string get_random_val(std::string)
@@ -125,7 +127,7 @@ std::string get_random_val(std::string)
 	std::string	str;
 	std::string	charSet = "abcdefghijklmnopqrstuvwxyzABSCDEFGHIJKLMOPQRSTUVWXYZ";
 
-	strLength = 5 + rand() % 10;
+	strLength = 5 + rand() % 5;
 	str.resize(strLength);
 	for (int i = 0; i < strLength; i++)
 		str[i] = charSet[rand() % charSet.length()];
@@ -139,8 +141,38 @@ char get_random_val(char)
 
 Human get_random_val(Human)
 {
-	int age = 1 + rand() % 120;
-	return Human(get_random_val(std::string()), age);
+	int age = 5 + rand() % 25;
+	return Human("test", age);
+}
+
+template <typename T1, typename T2>
+ft::pair<T1, T2> get_random_val(ft::pair<T1, T2>)
+{
+	return ft::make_pair(get_random_val(T1()), get_random_val(T2()));
+}
+
+template <typename T>
+T copy_val(T & val)
+{
+	return val;
+}
+
+template <typename T1, typename T2>
+std::pair<T1, T2> copy_val(ft::pair<T1, T2> & src)
+{
+	return std::make_pair(src.first, src.second);
+}
+
+template <typename T>
+T get_key(T & val)
+{
+	return val;
+}
+
+template <typename T1, typename T2>
+T1 get_key(ft::pair<T1, T2> & src)
+{
+	return src.first;
 }
 
 template <typename stdCont, typename ftCont>
@@ -157,6 +189,64 @@ void print_result(stdCont const& std_c, ftCont const& ft_c)
 		std::cout << "std-> " << std_res << std::endl;
 		std::cout << "ft -> " << ft_res << std::endl;
 	}
+	std::cout.flush();
+}
+
+template <typename T, typename ftCont, typename stdCont>
+void print_result(ft::stack<T, ftCont> & ftSt, std::stack<T, stdCont> & stdSt)
+{
+	std::stringstream ftRes;
+	std::stringstream stdRes;
+
+	ftRes << "SIZE: " << ftSt.size() << "\n";
+	stdRes << "SIZE: " << stdSt.size() << "\n";
+
+	if (ftSt.size() > 0 && stdSt.size() > 0)
+	{
+		ftRes << "TOP: " << ftSt.top() << "\n";
+		stdRes << "TOP: " << stdSt.top() << "\n";
+	}
+
+	if (ftRes.str() == stdRes.str())
+		print_test_res(OK);
+	else
+	{
+		print_test_res(KO);
+		std::cout << std::endl;
+		std::cout << "std-> " << ftRes.str() << std::endl;
+		std::cout << "ft -> " << stdRes.str() << std::endl;
+	}
+	std::cout.flush();
+}
+
+template <typename T, typename ftCont, typename stdCont>
+void print_result(ft::queue<T, ftCont> & ftSt, std::queue<T, stdCont> & stdSt)
+{
+	std::stringstream ftRes;
+	std::stringstream stdRes;
+
+	ftRes << "SIZE: " << ftSt.size() << "\n";
+	stdRes << "SIZE: " << stdSt.size() << "\n";
+
+	if (ftSt.size() > 0 && stdSt.size() > 0)
+	{
+		ftRes << "FRONT: " << ftSt.front() << "\n";
+		stdRes << "FRONT: " << stdSt.front() << "\n";
+
+		ftRes << "BACK: " << ftSt.back() << "\n";
+		stdRes << "BACK: " << stdSt.back() << "\n";
+	}
+	
+	if (ftRes.str() == stdRes.str())
+		print_test_res(OK);
+	else
+	{
+		print_test_res(KO);
+		std::cout << std::endl;
+		std::cout << "std-> " << ftRes.str() << std::endl;
+		std::cout << "ft -> " << stdRes.str() << std::endl;
+	}
+	std::cout.flush();
 }
 
 template <typename T>
@@ -171,6 +261,7 @@ void print_result(T std_res, T ft_res)
 		std::cout << "std-> " << std_res << std::endl;
 		std::cout << "ft -> " << ft_res << std::endl;
 	}
+	std::cout.flush();
 }
 
 template <typename stdPair, typename ftPair>
@@ -185,6 +276,7 @@ void print_result_pair(stdPair & std_res, ftPair & ft_res)
 		std::cout << "std-> " << std_res << std::endl;
 		std::cout << "ft -> " << ft_res << std::endl;
 	}
+	std::cout.flush();
 }
 
 template <typename T, typename stdCont, typename ftCont>
@@ -370,24 +462,24 @@ class VectorTests
 				stdCont std2(size, val);
 				ftCont ft2(size, val);
 
-				stdCont std3(std1.rbegin(), std1.rend());
-				ftCont ft3(ft1.rbegin(), ft1.rend());
-
 				std2.insert(std2.end() - std2.size() / 2, std1.begin() + 1, std1.end() - 1);
 				ft2.insert(ft2.end() - ft2.size() / 2, ft1.begin() + 1, ft1.end() - 1);
 				print_result(std2, ft2);
-
-				std3.insert(std3.begin(), size, val);
-				ft3.insert(ft3.begin(), size, val);
-				print_result(std3, ft3);
 
 				std2.insert(std2.end() - 1, (size_t)0, T());
 				ft2.insert(ft2.end() - 1, (size_t)0, T());
 				print_result(std2, ft2);
 
-				std3.insert(std3.begin() + std3.size() / 2, std3.begin(), std3.end());
-				ft3.insert(ft3.begin() + ft3.size() / 2, ft3.begin(), ft3.end());
+				stdCont std3(std1.rbegin(), std1.rend());
+				ftCont ft3(ft1.rbegin(), ft1.rend());
+
+				std3.insert(std3.begin(), size, val);
+				ft3.insert(ft3.begin(), size, val);
 				print_result(std3, ft3);
+
+				// std3.insert(std3.begin() + std3.size() / 2, std3.begin(), std3.end());
+				// ft3.insert(ft3.begin() + ft3.size() / 2, ft3.begin(), ft3.end());
+				// print_result(std3, ft3);
 			}
 			std::cout << std::endl;
 
@@ -1000,53 +1092,51 @@ class ListTests
 #include <map>
 #include "map.hpp"
 
-template <typename Key, typename Val>
-class MapTests
+template <typename ftCont, typename stdCont, typename Key>
+class MapSetTests
 {
 	private:
-		typedef std::map<Key, Val> stdMap;
-		typedef ft::map<Key, Val> ftMap;
+		typedef typename stdCont::iterator stdIt;
+		typedef typename ftCont::iterator ftIt;
 
-		typedef typename std::map<Key, Val>::iterator stdIt;
-		typedef typename ft::map<Key, Val>::iterator ftIt;
+		typedef typename stdCont::value_type stdVal;
+		typedef typename ftCont::value_type ftVal;
 
-		void fill_map(ftMap & ft_m, stdMap & std_m)
+		void fill_cont(ftCont & ft_m, stdCont & std_m)
 		{
-
-			int count = 1000;
+			int count = 25;
 
 			while (count-- > 0)
 			{
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
-
-				ft_m.insert(ft::make_pair(k, v));
-				std_m.insert(std::make_pair(k, v));
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
 			}
 		}
 
 	public:
-		MapTests(void) { }
-		~MapTests(void) { }
+		MapSetTests(void) { }
+		~MapSetTests(void) { }
 
 		void DoTests(void)
 		{
-			ftMap ft_m;
-			stdMap std_m;
-			fill_map(ft_m, std_m);
+			ftCont ft_m;
+			stdCont std_m;
+			fill_cont(ft_m, std_m);
 
 			print_func_name("counstructors");
 			{	
-				ftMap ft_m1;
-				stdMap std_m1;
+				ftCont ft_m1;
+				stdCont std_m1;
 				print_result(std_m1, ft_m1);
 
-				ftMap ft_m2(ft_m);
-				stdMap std_m2(std_m);
+				ftCont ft_m2(ft_m);
+				stdCont std_m2(std_m);
 				print_result(std_m2, ft_m2);
 				
-				ftMap ft_m3(ft_m.rbegin(), ft_m.rend());
-				stdMap std_m3(std_m.rbegin(), std_m.rend());
+				ftCont ft_m3(ft_m.rbegin(), ft_m.rend());
+				stdCont std_m3(std_m.rbegin(), std_m.rend());
 				print_result(std_m3, ft_m3);
 			}
 			std::cout << std::endl;
@@ -1059,62 +1149,52 @@ class MapTests
 
 			print_func_name("empty");
 			{
-				ftMap ft_m1;
-				stdMap std_m1;
+				ftCont ft_m1;
+				stdCont std_m1;
 				print_result(std_m1.empty(), ft_m1.empty());
 
 				print_result(std_m.empty(), ft_m.empty());				
 			}
 			std::cout << std::endl;
 
-			print_func_name("operator[]");
-			{
-				ftMap ft_m1(ft_m);
-				stdMap std_m1(std_m);
-				
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
-				Val v1 = get_random_val(Val());
-
-				ft_m1[k] = v;
-				std_m1[k] = v;
-				print_result(std_m1, ft_m1);
-
-				ft_m1[k] = v1;
-				std_m1[k] = v1;
-				print_result(std_m1, ft_m1);
-
-				print_result(ft_m1[k], std_m1[k]);
-			}
-			std::cout << std::endl;
-
 			print_func_name("insert");
 			{
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
 
-				ftMap ft_m1;
-				stdMap std_m1;
-				fill_map(ft_m1, std_m1);
+				ftCont ft_m1;
+				stdCont std_m1;
+				fill_cont(ft_m1, std_m1);
+				print_result(std_m1, ft_m1);
+
+				ft_m1.insert(ft_v);
+				std_m1.insert(std_v);
+				ft_m1.insert(ft_v);
+				std_m1.insert(std_v);
+				ft_m1.insert(ft_v);
+				std_m1.insert(std_v);
 				print_result(std_m1, ft_m1);
 
 				ft_m1.insert(ft_m.rbegin(), ft_m.rend());
 				std_m1.insert(std_m.rbegin(), std_m.rend());
 				print_result(std_m1, ft_m1);
-				
-				ft_m1.insert(ft_m.begin(), ft::make_pair(k, v));
-				std_m1.insert(std_m.begin(), std::make_pair(k, v));
+
+				ft_m1.insert(ft_m1.begin(), ft_v);
+				std_m1.insert(std_m1.begin(), std_v);
 				print_result(std_m1, ft_m1);
 			}
 			std::cout << std::endl;
 
 			print_func_name("erase");
 			{
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				Key k = get_key(ft_v);
 
-				ft_m.insert(ft::make_pair(k, v));
-				std_m.insert(std::make_pair(k, v));
+				std::cout << "key=" << k << "   ";
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
 
 				ftIt ft_it = ft_m.find(k);
 				stdIt std_it = std_m.find(k);
@@ -1123,15 +1203,19 @@ class MapTests
 				std_m.erase(std_it);
 				print_result(std_m, ft_m);
 
-				ft_m.insert(ft::make_pair(k, v));
-				std_m.insert(std::make_pair(k, v));
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
 
 				ft_m.erase(k);
 				std_m.erase(k);
 				print_result(std_m, ft_m);
 
-				ftMap ft_m1(ft_m);
-				stdMap std_m1(std_m);
+				ft_m.erase(k);
+				std_m.erase(k);
+				print_result(std_m, ft_m);
+
+				ftCont ft_m1(ft_m);
+				stdCont std_m1(std_m);
 
 				ft_m1.erase(ft_m1.begin(), ft_m1.end());
 				std_m1.erase(std_m1.begin(), std_m1.end());
@@ -1141,13 +1225,13 @@ class MapTests
 			
 			print_func_name("swap");
 			{
-				ftMap ft_m1;
-				stdMap std_m1;
-				fill_map(ft_m1, std_m1);
+				ftCont ft_m1;
+				stdCont std_m1;
+				fill_cont(ft_m1, std_m1);
 
-				ftMap ft_m2;
-				stdMap std_m2;
-				fill_map(ft_m2, std_m2);
+				ftCont ft_m2;
+				stdCont std_m2;
+				fill_cont(ft_m2, std_m2);
 
 				ft_m1.swap(ft_m2);
 				std_m1.swap(std_m2);
@@ -1158,9 +1242,9 @@ class MapTests
 
 			print_func_name("clear");
 			{
-				ftMap ft_m1;
-				stdMap std_m1;
-				fill_map(ft_m1, std_m1);
+				ftCont ft_m1;
+				stdCont std_m1;
+				fill_cont(ft_m1, std_m1);
 
 				ft_m1.clear();
 				std_m1.clear();
@@ -1174,51 +1258,308 @@ class MapTests
 
 			print_func_name("find");
 			{
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				Key k = get_key(ft_v);
 
-				ft_m.insert(ft::make_pair(k, v));
-				std_m.insert(std::make_pair(k, v));
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+				print_result(std_m, ft_m);
 
 				ftIt ft_it = ft_m.find(k);
 				stdIt std_it = std_m.find(k);
+				print_result( stdCont(std_it, std_it), ftCont(ft_it, ft_it) );
+			}
+			std::cout << std::endl;
 
-				print_result_pair(*std_it, *ft_it);
+			print_func_name("count");
+			{
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				Key k = get_key(ft_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				size_t std_n = std_m.count(k);
+				size_t ft_n = ft_m.count(k);
+				print_result(std_n, ft_n);
 			}
 			std::cout << std::endl;
 
 			print_func_name("lower_bound");
 			{
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				Key k = get_key(ft_v);
 
-				ft_m.insert(ft::make_pair(k, v));
-				std_m.insert(std::make_pair(k, v));
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
 
 				ftIt ft_it = ft_m.lower_bound(k);
 				stdIt std_it = std_m.lower_bound(k);
-
-				print_result_pair(*std_it, *ft_it);
+				print_result( stdCont(std_it, std_m.end()), ftCont(ft_it, ft_m.end()) );
 			}
 			std::cout << std::endl;
 
 			print_func_name("upper_bound");
 			{
-				Key k = get_random_val(Key());
-				Val v = get_random_val(Val());
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				Key k = get_key(ft_v);
 
-				ft_m.insert(ft::make_pair(k, v));
-				std_m.insert(std::make_pair(k, v));
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
 
 				ftIt ft_it = ft_m.upper_bound(k);
 				stdIt std_it = std_m.upper_bound(k);
+				print_result( stdCont(std_m.begin(), std_it), ftCont(ft_m.begin(), ft_it) );
+			}
+			std::cout << std::endl;
 
-				print_result_pair(*std_it, *ft_it);
+			print_func_name("equal_range");
+			{
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				Key k = get_key(ft_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ft_m.insert(ft_v);
+				std_m.insert(std_v);
+
+				ftIt ft_it1 = ft_m.lower_bound(k);
+				ftIt ft_it2 = ft_m.upper_bound(k);
+				stdIt std_it1 = std_m.lower_bound(k);
+				stdIt std_it2 = std_m.upper_bound(k);
+				print_result( stdCont(std_it1, std_it2), ftCont(ft_it1, ft_it2) );
+			}
+			std::cout << std::endl;
+		}	
+
+		void accessOperator()
+		{
+			ftCont ft_m;
+			stdCont std_m;
+			fill_cont(ft_m, std_m);
+
+			print_func_name("operator[]");
+			{
+				ftCont ft_m1(ft_m);
+				stdCont std_m1(std_m);
+				Key k = get_random_val(Key());
+
+				typename ftCont::mapped_type v1 = get_random_val(typename ftCont::mapped_type());
+				typename ftCont::mapped_type v2 = get_random_val(typename ftCont::mapped_type());
+				
+				ft_m1[k] = v1;
+				std_m1[k] = v1;
+				print_result(std_m1, ft_m1);
+
+				ft_m1[k] = v2;
+				std_m1[k] = v2;
+				print_result(std_m1, ft_m1);
+				
+				print_result(ft_m1[k], std_m1[k]);
 			}
 			std::cout << std::endl;
 		}
-		
-		
+};
+
+template <typename ftCont, typename stdCont>
+class StakcQueueTests
+{
+	private:
+		typedef typename ftCont::value_type value_type;
+
+	public:
+		StakcQueueTests(void) { }
+		~StakcQueueTests(void) { }
+
+		void DoTests(void)
+		{
+			ftCont ft_s;
+			stdCont std_s;
+
+			value_type val1 = get_random_val(value_type());
+			value_type val2 = get_random_val(value_type());
+
+			print_func_name("counstructors");
+			{
+				print_result(ft_s, std_s);
+			}
+			std::cout << std::endl;
+
+			print_func_name("empty");
+			{
+				print_result(std_s.empty(), ft_s.empty());
+				ft_s.push(val1);
+				std_s.push(val1);
+				print_result(std_s.empty(), ft_s.empty());
+			}
+			std::cout << std::endl;
+
+			print_func_name("size");
+			{
+				ftCont ft_s1;
+				stdCont std_s1;
+
+				print_result(std_s1.size(), ft_s1.size());
+				ft_s1.push(val1);
+				std_s1.push(val1);
+				print_result(std_s1.size(), ft_s1.size());
+			}
+			std::cout << std::endl;
+
+			print_func_name("push");
+			{
+				print_result(ft_s, std_s);
+				ft_s.push(val2);
+				std_s.push(val2);
+				print_result(ft_s, std_s);
+			}
+			std::cout << std::endl;
+
+			print_func_name("pop");
+			{
+				ft_s.pop();
+				std_s.pop();
+				print_result(ft_s, std_s);
+
+				ft_s.pop();
+				std_s.pop();
+				print_result(ft_s, std_s);
+			}
+			std::cout << std::endl;
+
+			print_func_name("relational");
+			{
+				ftCont ft_s1;
+				stdCont std_s1;
+
+				int count = get_random_val(int());
+				while (count-- > 0)
+				{
+					value_type val = get_random_val(value_type());
+					ft_s1.push(val);
+					std_s1.push(val);
+					ft_s.push(val);
+					std_s.push(val);
+				}
+
+				print_result(std_s == std_s1, ft_s == ft_s1);
+				print_result(std_s1 != std_s, ft_s1 != ft_s);
+
+				ft_s1.pop();
+				std_s1.pop();
+
+				print_result(std_s < std_s1, ft_s < ft_s1);
+				print_result(std_s1 > std_s, ft_s1 > ft_s);
+
+				ft_s.pop();
+				std_s.pop();
+
+				print_result(std_s <= std_s1, ft_s <= ft_s1);
+				print_result(std_s1 >= std_s, ft_s1 >= ft_s);
+			}
+			std::cout << std::endl;
+		}
+
+		void stackAccess(void)
+		{
+			print_func_name("pop");
+			ftCont ft_s;
+			stdCont std_s;
+
+			value_type val1 = get_random_val(value_type());
+			value_type val2 = get_random_val(value_type());
+			
+			ft_s.push(val1);
+			std_s.push(val1);
+			print_result(std_s.top(), ft_s.top());
+
+			ft_s.push(val2);
+			std_s.push(val2);
+			print_result(std_s.top(), ft_s.top());
+			std::cout << std::endl;
+		}
+
+		void queueAccess(void)
+		{
+			print_func_name("back, front");
+			ftCont ft_s;
+			stdCont std_s;
+
+			value_type val1 = get_random_val(value_type());
+			value_type val2 = get_random_val(value_type());
+			
+			ft_s.push(val1);
+			std_s.push(val1);
+			print_result(std_s.back(), ft_s.back());
+			print_result(std_s.front(), ft_s.front());
+
+			ft_s.push(val2);
+			std_s.push(val2);
+			print_result(std_s.back(), ft_s.back());
+			print_result(std_s.front(), ft_s.front());
+			std::cout << std::endl;
+		}
+
 };
 
 #endif
