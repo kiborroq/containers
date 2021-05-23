@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tests.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/16 19:30:50 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/23 13:34:42 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 13:50:32 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,15 +48,15 @@ void vector_tests(void)
 	test1.DoTests();
 	std::cout << std::endl;
 
-	print_type("STRING");
-	VectorTests<std::string, std::vector<std::string>, ft::vector<std::string> > test2;
-	test2.DoTests();
-	std::cout << std::endl;
+	// print_type("STRING");
+	// VectorTests<std::string, std::vector<std::string>, ft::vector<std::string> > test2;
+	// test2.DoTests();
+	// std::cout << std::endl;
 
-	print_type("HUMAN");
-	VectorTests<Human, std::vector<Human>, ft::vector<Human> > test4;
-	test4.DoTests();
-	std::cout << std::endl;
+	// print_type("HUMAN");
+	// VectorTests<Human, std::vector<Human>, ft::vector<Human> > test4;
+	// test4.DoTests();
+	// std::cout << std::endl;
 }
 
 void list_tests(void)

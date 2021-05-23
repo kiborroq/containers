@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   list.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
+/*   By: kiborroq <kiborroq@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/12 22:32:52 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/23 11:45:12 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 13:51:14 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 # include "iterator.hpp"
 # include "utils.hpp"
 # include <memory>
-# include <limits>
 
 namespace ft
 {
