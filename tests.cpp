@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/16 19:30:50 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/23 00:13:09 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 13:34:42 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +48,15 @@ void vector_tests(void)
 	test1.DoTests();
 	std::cout << std::endl;
 
-	// print_type("HUMAN");
-	// VectorTests<Human, std::vector<Human>, ft::vector<Human> > test4;
-	// test4.DoTests();
+	print_type("STRING");
+	VectorTests<std::string, std::vector<std::string>, ft::vector<std::string> > test2;
+	test2.DoTests();
+	std::cout << std::endl;
+
+	print_type("HUMAN");
+	VectorTests<Human, std::vector<Human>, ft::vector<Human> > test4;
+	test4.DoTests();
+	std::cout << std::endl;
 }
 
 void list_tests(void)
@@ -65,6 +71,8 @@ void list_tests(void)
 	// print_type("HUMAN");
 	// ListTests<Human, std::list<Human>, ft::list<Human> > test4;
 	// test4.DoTests();
+	// std::cout << std::endl;
+
 }
 
 void map_tests(void)
@@ -81,6 +89,7 @@ void map_tests(void)
 	// MapSetTests<ft::map<char, Human>, std::map<char, Human>, char> test3;
 	// test3.accessOperator();
 	// test3.DoTests();
+	// std::cout << std::endl;
 }
 
 void multimap_tests(void)
@@ -95,6 +104,7 @@ void multimap_tests(void)
 	// print_type("CHR-HUM");
 	// MapSetTests<ft::multimap<char, Human>, std::multimap<char, Human>, char> test3;
 	// test3.DoTests();
+	// std::cout << std::endl;
 }
 
 void set_tests(void)
@@ -109,6 +119,7 @@ void set_tests(void)
 	// print_type("HUMAN");
 	// MapSetTests<ft::set<Human>, std::set<Human>, Human> test4;
 	// test4.DoTests();
+	// std::cout << std::endl;
 }
 
 void multiset_tests(void)
@@ -123,6 +134,7 @@ void multiset_tests(void)
 	// print_type("HUMAN");
 	// MapSetTests<ft::multiset<Human>, std::multiset<Human>, Human> test4;
 	// test4.DoTests();
+	// std::cout << std::endl;
 }
 
 void stack_tests(void)

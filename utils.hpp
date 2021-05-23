@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/23 10:09:38 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/23 00:13:54 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 13:21:38 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,16 @@ namespace ft
 		_rb_node(_rb_node const& n)
 			: color(n.color), parent(n.parent), left(n.left), right(n.right), data(n.data)
 		{ }
+
+		_rb_node & operator=(_rb_node const& n)
+		{
+			color = n.color;
+			parent = n.parent;
+			left = n.left;
+			right = n.right;
+			data = n.data;
+			return *this;
+		}
 
 		bool _is_right(void)
 		{ return this == this->parent->right; }
@@ -443,21 +453,44 @@ namespace ft
 
 			void _swap(_rb_tree & tree)
 			{
-				if (_size > 0)
+				if (this == &tree)
+					return ;
+
+				if (this->_size > 0)
 				{
 					this->_min.parent->left = &tree._min;
-					tree._min.parent->left = &this->_min;
-
 					this->_max.parent->right = &tree._max;
-					tree._max.parent->right = &this->_max;
+				}
 
-					ft::swap(this->_min.parent, tree._min.parent);
-					ft::swap(this->_max.parent, tree._max.parent);
-					ft::swap(this->_size, tree._size);
-					ft::swap(this->_less, tree._less);
-					ft::swap(this->_alloc, tree._alloc);
+				if (tree._size > 0)
+				{
+					tree._min.parent->left = &this->_min;
+					tree._max.parent->right = &this->_max;
+				}
+
+				ft::swap(this->_root, tree._root);
+				ft::swap(this->_min.parent, tree._min.parent);
+				ft::swap(this->_max.parent, tree._max.parent);
+				ft::swap(this->_size, tree._size);
+				ft::swap(this->_less, tree._less);
+				ft::swap(this->_alloc, tree._alloc);
+
+				if (this->_size == 0)
+					_link_root_min_max();
+				else
+				{
+					this->_max.left = NULL;
+					this->_min.right = NULL;
+				}
+				if (tree._size == 0)
+					tree._link_root_min_max();
+				else
+				{
+					tree._max.left = NULL;
+					tree._min.right = NULL;
 				}
 			}
+
 
 			/*
 			**Member functions - OPERATIONS

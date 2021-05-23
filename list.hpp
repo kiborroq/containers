@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/12 22:32:52 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/23 00:13:47 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 11:45:12 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -292,6 +292,9 @@ namespace ft
 
 			void swap(list & x)
 			{
+				if (this == &x)
+					return ;
+
 				size_type size_tmp = x._size;
 				node * begin_tmp = x._begin.next;
 				node * end_tmp = x._end.prev;
@@ -329,14 +332,10 @@ namespace ft
 			*/
 
 			void splice(iterator position, list & x)
-			{
-				splice(position, x, x.begin(), x.end());
-			}
+			{ splice(position, x, x.begin(), x.end()); }
 
 			void splice(iterator position, list & x, iterator i)
-			{
-				splice(position, x, i, ++i);
-			}
+			{ splice(position, x, i, ++i); }
 
 			void splice(iterator position, list & x, iterator first, iterator last)
 			{

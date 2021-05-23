@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/17 13:45:00 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/23 00:18:17 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 13:36:19 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -486,9 +486,9 @@ class VectorTests
 				ft3.insert(ft3.begin(), size, val);
 				print_result(std3, ft3);
 
-				// std3.insert(std3.begin() + std3.size() / 2, std3.begin(), std3.end());
-				// ft3.insert(ft3.begin() + ft3.size() / 2, ft3.begin(), ft3.end());
-				// print_result(std3, ft3);
+				std3.insert(std3.begin(), std3.begin(), std3.end());
+				ft3.insert(ft3.begin(), ft3.begin(), ft3.end());
+				print_result(std3, ft3);
 			}
 			std::cout << std::endl;
 
@@ -527,6 +527,20 @@ class VectorTests
 				
 				std2.swap(std1);
 				ft2.swap(ft1);
+				print_result(std2, ft2);
+				print_result(std1, ft1);
+
+				ftCont ft3;
+				stdCont std3;
+				
+				std3.swap(std1);
+				ft3.swap(ft1);
+				print_result(std3, ft3);
+				print_result(std1, ft1);
+
+				std1.swap(std2);
+				ft1.swap(ft2);
+				print_result(std1, ft1);
 				print_result(std2, ft2);
 			}
 			std::cout << std::endl;
@@ -891,6 +905,20 @@ class ListTests
 				
 				std2.swap(std1);
 				ft2.swap(ft1);
+				print_result(std2, ft2);
+				print_result(std1, ft1);
+
+				ftCont ft3;
+				stdCont std3;
+				
+				std3.swap(std1);
+				ft3.swap(ft1);
+				print_result(std3, ft3);
+				print_result(std1, ft1);
+
+				std1.swap(std2);
+				ft1.swap(ft2);
+				print_result(std1, ft1);
 				print_result(std2, ft2);
 			}
 			std::cout << std::endl;
@@ -1277,6 +1305,30 @@ class MapSetTests
 				ftCont ft_m2;
 				stdCont std_m2;
 				fill_cont(ft_m2, std_m2);
+
+				ft_m1.swap(ft_m2);
+				std_m1.swap(std_m2);
+				print_result(std_m1, ft_m1);
+				print_result(std_m2, ft_m2);
+
+				ftVal ft_v = get_random_val(ftVal());
+				stdVal std_v = copy_val(ft_v);
+				ft_m1.insert(ft_v);
+				std_m1.insert(std_v);
+				print_result(std_m1, ft_m1);
+
+				ftVal ft_v1 = get_random_val(ftVal());
+				stdVal std_v1 = copy_val(ft_v1);
+				ft_m2.insert(ft_v1);
+				std_m2.insert(std_v1);
+				print_result(std_m2, ft_m2);
+
+				ftCont ft_m3;
+				stdCont std_m3;
+				ft_m3.swap(ft_m2);
+				std_m3.swap(std_m2);
+				print_result(std_m3, ft_m3);
+				print_result(std_m2, ft_m2);
 
 				ft_m1.swap(ft_m2);
 				std_m1.swap(std_m2);

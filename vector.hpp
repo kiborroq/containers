@@ -6,7 +6,7 @@
 /*   By: kiborroq <kiborroq@kiborroq.42.fr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/06 20:41:55 by kiborroq          #+#    #+#             */
-/*   Updated: 2021/05/22 12:05:46 by kiborroq         ###   ########.fr       */
+/*   Updated: 2021/05/23 13:32:57 by kiborroq         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -235,6 +235,9 @@ namespace ft
 
 			void swap(vector & x)
 			{
+				if (this == &x)
+					return ;
+
 				pointer v_tmp = x._v;
 				size_type size_tmp = x.size();
 				size_type cap_tmp = x.size();
